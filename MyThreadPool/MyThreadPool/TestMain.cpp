@@ -70,18 +70,28 @@ int main()
 	//	std::cout << "ssss" << std::endl;
 	//}
 
-	myAsync<void>([]()
-		{
-			std::cout << std::this_thread::get_id() << std::endl;
-			std::this_thread::sleep_for(std::chrono::seconds(1));
-			std::cout << std::this_thread::get_id() << std::endl;
-		}
-	).get();
+	//myAsync<void>([]()
+	//	{
+	//		std::cout << std::this_thread::get_id() << std::endl;
+	//		std::this_thread::sleep_for(std::chrono::seconds(1));
+	//		std::cout << std::this_thread::get_id() << std::endl;
+	//	}
+	//).get();
 
 	//auto res = std::async(std::launch::async, []() {
 
 	//	return 1;
 	//	}).get();
+
+	auto res = myAsync<int>([]() {
+		std::cout << std::this_thread::get_id() << std::endl;
+		std::this_thread::sleep_for(std::chrono::seconds(1));
+		std::cout << std::this_thread::get_id() << std::endl;
+		return 1;
+	}).get();
+
+
+
 
 
 	getchar();
