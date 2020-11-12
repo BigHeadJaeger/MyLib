@@ -34,10 +34,12 @@ namespace threadUtil
 
 		~ThreadPool()
 		{
-			forceStop();
+			if (isRunning())
+			{
+				forceStop();
+			}
+			std::cout << "thread pool destroy" << std::endl;
 		}
-
-		void test(int num = 2);
 
 		void start(int num = 4);
 		// 立刻停止线程池，抛弃剩余未执行的task
@@ -52,12 +54,7 @@ namespace threadUtil
 
 		//void 
 
-		void setPoolState(POOL_STATE _state) 
-		{ 
-			// 设置状态的时候加锁
-			std::unique_lock<std::mutex> lck(mutex);
-			state = _state; 
-		}
+
 
 		bool isRunning() { return state == POOL_STATE::RUNNING; }
 		bool isStopping() { return state == POOL_STATE::STOPPING; }
@@ -72,15 +69,17 @@ namespace threadUtil
 		std::function<void()> getTask();
 
 		void stop(bool isWait);
-
 		void reset();
+		void setPoolState(POOL_STATE _state)
+		{
+			// 设置状态的时候加锁
+			std::unique_lock<std::mutex> lck(mutex);
+			state = _state;
+		}
 
 		std::mutex mutex;
 		std::condition_variable condition;
 		int threadNum;				// 管理的线程总数
-		//bool isRunning = false;		// 是否正在运行
-		//bool isStopping = false;	
-		//bool noMoreTask = false;	// 标志不会再有任务进入了
 		std::vector<std::shared_ptr<std::thread>> threadList;
 
 		std::deque<taskFunc> taskList;
