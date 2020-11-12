@@ -64,7 +64,6 @@ std::function<void()> ThreadPool::getTask()
 {
 	std::unique_lock<std::mutex> lck(mutex);
 
-	// 是否存在线程池正在停止 当前线程正在等待 且taskList不为空的情况
 	while (taskList.empty() && isRunning())
 	{
 		condition.wait(lck);
@@ -90,6 +89,7 @@ void ThreadPool::stop(bool isWait)
 
 	if (isWait)
 	{
+		
 		setPoolState(POOL_STATE::STOPPING);
 		condition.notify_all();		// 解除所有条件的wait
 	}

@@ -52,10 +52,6 @@ namespace threadUtil
 
 		POOL_STATE getState() { return state; }
 
-		//void 
-
-
-
 		bool isRunning() { return state == POOL_STATE::RUNNING; }
 		bool isStopping() { return state == POOL_STATE::STOPPING; }
 		bool isStop() { return state == POOL_STATE::STOP; }
@@ -75,6 +71,21 @@ namespace threadUtil
 			// 设置状态的时候加锁
 			std::unique_lock<std::mutex> lck(mutex);
 			state = _state;
+			switch (_state)
+			{
+			case threadUtil::POOL_STATE::RUNNING:
+				std::cout << "thread pool running" << std::endl;
+				break;
+			case threadUtil::POOL_STATE::STOPPING:
+				std::cout << "thread pool is stopping, can not add task anymore" << std::endl;
+				break;
+			case threadUtil::POOL_STATE::STOP:
+				std::cout << "thread pool stop" << std::endl;
+				break;
+			default:
+				break;
+			}
+			
 		}
 
 		std::mutex mutex;
