@@ -9,13 +9,16 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="MyLibs">
+    <Filter Include="common">
+      <UniqueIdentifier>{d53ad179-bfd0-46b5-9731-241fd09b50fc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="modules">
       <UniqueIdentifier>{ee5d97a0-8b1d-493a-b594-d8e7eb157d7b}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MyThreadPool.cpp">
-      <Filter>MyLibs</Filter>
+      <Filter>modules</Filter>
     </ClCompile>
     <ClCompile Include="TestMain.cpp">
       <Filter>源文件</Filter>
@@ -23,7 +26,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MyThreadPool.h">
-      <Filter>MyLibs</Filter>
+      <Filter>modules</Filter>
+    </ClInclude>
+    <ClInclude Include="Common.h">
+      <Filter>common</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
