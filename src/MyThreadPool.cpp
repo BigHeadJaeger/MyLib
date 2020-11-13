@@ -43,6 +43,20 @@ void ThreadPool::addTask(const taskFunc& func)
 	}
 }
 
+int threadUtil::ThreadPool::waitAllTaskFinish()
+{
+	std::unique_lock<std::mutex> lck(mxWaitTask);
+	while (!isStop() && !taskList.empty())
+	{
+		cvWaitTaskFinish.wait(lck);
+	}
+
+	if (!isStop())
+		return 1;
+	else
+		return 0;
+}
+
 void ThreadPool::threadLoop()
 {
 	while (isRunning() || isStopping())
@@ -52,12 +66,13 @@ void ThreadPool::threadLoop()
 			// 跳出循环，当前线程结束
 			break;
 		}
-			
+
 		auto task = getTask();
 		if (task)
 		{
 			(*task.get())();
 
+			mxRunningList.lock();
 			auto it = taskRunningList.find(task);
 			if (it != taskRunningList.end())
 			{
@@ -67,19 +82,13 @@ void ThreadPool::threadLoop()
 			{
 				std::cout << "error" << std::endl;
 			}
+			mxRunningList.unlock();
 
-			// 完成一个任务之后
+			// 完成一个任务之后判断是否所有任务完成
 			if (isNoTask())
 			{
 				cvWaitTaskFinish.notify_all();
 			}
-
-			// 
-			// 取完当前任务后任务列表为空
-			//if (taskList.empty())
-			//{
-			//	cvWaitTaskFinish.notify_all();
-			//}
 		}
 	}
 }
@@ -95,13 +104,14 @@ std::shared_ptr<ThreadPool::taskFunc> ThreadPool::getTask()
 
 	std::shared_ptr<taskFunc> pFunc;
 
-	//taskFunc func = nullptr;
 	if (!taskList.empty())	// 如果线程池已经停止了则任务列表一定是清空的
 	{
 		auto func = taskList.front();
 		pFunc = std::make_shared<taskFunc>(func);
 		taskList.pop_front();
+		mxRunningList.lock();
 		taskRunningList.insert(pFunc);
+		mxRunningList.unlock();
 	}
 
 	return pFunc;

@@ -48,20 +48,8 @@ namespace threadUtil
 		void start(int num = 4);
 		// 添加任务
 		void addTask(const taskFunc& func);
-		// 等待所有任务完成，调用之后在当前所有任务处理完之前添加新的任务都将等待（确保调用的时候已经添加完了所有任务）
-		int waitAllTaskFinish()
-		{
-			std::unique_lock<std::mutex> lck(mxWaitTask);
-			while (!isStop()&&!taskList.empty())
-			{
-				cvWaitTaskFinish.wait(lck);
-			}
-
-			if (!isStop())
-				return 1;
-			else
-				return 0;
-		}
+		// 等待所有任务完成，调用之后在当前所有任务处理完之前添加新的任务都将阻塞（确保调用的时候已经添加完了所有任务）
+		int waitAllTaskFinish();
 
 		// 立刻停止线程池，抛弃剩余未执行的task
 		void forceStop();
@@ -92,6 +80,7 @@ namespace threadUtil
 
 		std::mutex mutex;							// 任务列表的操作锁
 		std::mutex mxWaitTask;						// 添加任务时的锁
+		std::mutex mxRunningList;					// 列表查询的锁
 		std::condition_variable cvTaskAdd;			// 任务添加的条件变量
 		std::condition_variable cvWaitTaskFinish;			// 等待所有任务完成的条件变量
 		int threadNum;								// 管理的线程总数
