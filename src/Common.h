@@ -8,6 +8,10 @@ namespace tools
 	{
 		std::initializer_list<int>({ (processFunc(std::forward<Args>(args)), 0) ... });
 	}
+
+
+
+
 }
 
 

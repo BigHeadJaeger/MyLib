@@ -7,6 +7,8 @@
 #include<thread>
 #include<queue>
 #include<future>
+#include<map>
+#include<set>
 
 namespace threadUtil
 {
@@ -17,6 +19,8 @@ namespace threadUtil
 		STOP		// 停止状态
 	};
 
+
+	// 不支持在一个任务中 添加一个新任务且等待新任务完成 只添加新任务可以
 	class ThreadPool
 	{
 	public:
@@ -40,15 +44,29 @@ namespace threadUtil
 			}
 			std::cout << "thread pool destroy" << std::endl;
 		}
-
+		// 开启线程池
 		void start(int num = 4);
+		// 添加任务
+		void addTask(const taskFunc& func);
+		// 等待所有任务完成，调用之后在当前所有任务处理完之前添加新的任务都将等待（确保调用的时候已经添加完了所有任务）
+		int waitAllTaskFinish()
+		{
+			std::unique_lock<std::mutex> lck(mxWaitTask);
+			while (!isStop()&&!taskList.empty())
+			{
+				cvWaitTaskFinish.wait(lck);
+			}
+
+			if (!isStop())
+				return 1;
+			else
+				return 0;
+		}
+
 		// 立刻停止线程池，抛弃剩余未执行的task
 		void forceStop();
-
 		// 不再接受任务，等现有任务处理完毕之后停止线程池
 		void waitStop();
-
-		void addTask(const taskFunc& func);
 
 		POOL_STATE getState() { return state; }
 
@@ -56,44 +74,33 @@ namespace threadUtil
 		bool isStopping() { return state == POOL_STATE::STOPPING; }
 		bool isStop() { return state == POOL_STATE::STOP; }
 
+		bool isTaskRunning() { return !taskRunningList.empty(); }
+		bool isTaskPending() { return !taskList.empty(); }
+		bool isNoTask() { return (!isTaskRunning() && !isTaskPending()); }
+
 	private:
 		ThreadPool(const ThreadPool&) = delete;
 		ThreadPool& operator=(const ThreadPool&) = delete;
 
 		void threadLoop();
 
-		std::function<void()> getTask();
+		std::shared_ptr<taskFunc> getTask();
 
 		void stop(bool isWait);
 		void reset();
-		void setPoolState(POOL_STATE _state)
-		{
-			// 设置状态的时候加锁
-			std::unique_lock<std::mutex> lck(mutex);
-			state = _state;
-			switch (_state)
-			{
-			case threadUtil::POOL_STATE::RUNNING:
-				std::cout << "thread pool running" << std::endl;
-				break;
-			case threadUtil::POOL_STATE::STOPPING:
-				std::cout << "thread pool is stopping, can not add task anymore" << std::endl;
-				break;
-			case threadUtil::POOL_STATE::STOP:
-				std::cout << "thread pool stop" << std::endl;
-				break;
-			default:
-				break;
-			}
-			
-		}
+		void setPoolState(POOL_STATE _state);
 
-		std::mutex mutex;
-		std::condition_variable condition;
-		int threadNum;				// 管理的线程总数
+		std::mutex mutex;							// 任务列表的操作锁
+		std::mutex mxWaitTask;						// 添加任务时的锁
+		std::condition_variable cvTaskAdd;			// 任务添加的条件变量
+		std::condition_variable cvWaitTaskFinish;			// 等待所有任务完成的条件变量
+		int threadNum;								// 管理的线程总数
 		std::vector<std::shared_ptr<std::thread>> threadList;
 
 		std::deque<taskFunc> taskList;
+
+		//std::vector<>
+		std::set<std::shared_ptr<taskFunc>> taskRunningList;	// 正在运行的任务列表
 
 		bool isAcceptTask = true;	// 是否可以接受任务
 
@@ -134,9 +141,3 @@ namespace threadUtil
 		return ptrPromise->get_future();
 	}
 }
-
-//class TaskDistributor
-//{
-//public:
-//
-//};

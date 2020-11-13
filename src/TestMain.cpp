@@ -2,6 +2,8 @@
 #include<atomic>
 #include<future>
 #include<tuple>
+#include<queue>
+#include"Common.h"
 
 using namespace threadUtil;
 
@@ -84,8 +86,30 @@ void excuteFun(T param)
 	cout << param << endl;
 }
 
+template<typename... Args>
+void testFun1(Args&& ... args)
+{
+	tools::processArgs([](auto param) {
+		cout << param << endl;
+		}, std::forward<Args>(args)...);
+}
+
+recursive_mutex rm;
+
+void testFun2()
+{
+	lock_guard<recursive_mutex> lck(rm);
+	cout << "start" << endl;
+	this_thread::sleep_for(chrono::seconds(2));
+	cout << "end" << endl;
+}
+
+
 int main()
 {
+
+	
+
 	//int a = 1;
 	//int b = 3;
 
@@ -98,11 +122,57 @@ int main()
 	//	cout << a << endl;
 	//	}, 1, 3, "Sds");
 
-	expand2(excuteFun<int>, 1, 3);
+	//expand2(excuteFun<int>, 1, 3);
 
+	//testFun1(3, 4, 5);
+
+	//tools::processArgs([](auto param) {
+	//	cout << param << endl;
+	//	}, 2, 3, "sd");
+
+
+
+	//queue<int> testQ;
+	//testQ.push(1);
+	//testQ.push(4);
+	//testQ.push(2);
+	//testQ.push(3);
+
+	//auto a = testQ.back();
+	//a = testQ.front();
+	//testQ.pop();
 
 	auto& myPool = ThreadPool::getInstance();
 	myPool.start(2);
+
+	//auto res = myAsync<int>([]() {
+	//	std::cout << std::this_thread::get_id() << std::endl;
+	//	this_thread::sleep_for(chrono::seconds(2));
+	//	std::cout << std::this_thread::get_id() << " end" << std::endl;
+	//	return 1;
+	//	}
+	//).get();
+
+
+	for (size_t i = 0; i < 3; i++)
+	{
+		//myPool.addTask([]() {
+		//	std::cout << std::this_thread::get_id() << std::endl;
+		//	this_thread::sleep_for(chrono::seconds(2));
+		//	std::cout << std::this_thread::get_id() << " end" << std::endl;
+		//	});
+
+		myAsync<void>([]() {
+			std::cout << std::this_thread::get_id() << std::endl;
+			this_thread::sleep_for(chrono::seconds(2));
+			std::cout << std::this_thread::get_id() << " end" << std::endl;
+			}
+		).get();
+	}
+
+	myPool.waitAllTaskFinish();
+
+	cout << "task all finish" << endl;
 
 
 	//for (int i = 0; i < 4; i++)
