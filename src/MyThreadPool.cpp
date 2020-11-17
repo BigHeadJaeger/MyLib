@@ -7,7 +7,7 @@ void ThreadPool::start(int num)
 {
 	if (isRunning())
 	{
-		std::cout << "thread pool already started" << std::endl;
+		//std::cout << "thread pool already started" << std::endl;
 		return;
 	}
 	threadNum = num;
@@ -31,26 +31,27 @@ void threadUtil::ThreadPool::waitStop()
 	stop(true);
 }
 
-void ThreadPool::addTask(const taskFunc& func)
-{
-	std::unique_lock<std::mutex> lck(mutex);
-	std::unique_lock<std::mutex> lck2(mxWaitTask);
-	//if(noMoreTask)
-	if (isRunning())
-	{
-		taskList.push_back(func);
-		cvTaskAdd.notify_one();
-	}
-}
+//void ThreadPool::addTask(const Func& func)
+//{
+//	std::unique_lock<std::mutex> lck(mutex);
+//	std::unique_lock<std::mutex> lck2(mxWaitTask);
+//	//if(noMoreTask)
+//	if (isRunning())
+//	{
+//		taskList.push_back(func);
+//		cvTaskAdd.notify_one();
+//	}
+//}
 
 int threadUtil::ThreadPool::waitAllTaskFinish()
 {
 	std::unique_lock<std::mutex> lck(mxWaitTask);
-	while (!isStop() && !taskList.empty())
+	while (!isStop() && (!taskList.empty() || !taskRunningList.empty()))
 	{
-		cvWaitTaskFinish.wait(lck);
+		std::this_thread::yield();
 	}
 
+	// 等待任务全部完成的过程中如果出发了stop，返回0
 	if (!isStop())
 		return 1;
 	else
@@ -70,7 +71,10 @@ void ThreadPool::threadLoop()
 		auto task = getTask();
 		if (task)
 		{
-			(*task.get())();
+			task->start();
+
+			task->run();
+			//(*task.get())();
 
 			mxRunningList.lock();
 			auto it = taskRunningList.find(task);
@@ -84,16 +88,12 @@ void ThreadPool::threadLoop()
 			}
 			mxRunningList.unlock();
 
-			// 完成一个任务之后判断是否所有任务完成
-			if (isNoTask())
-			{
-				cvWaitTaskFinish.notify_all();
-			}
+			task->end();
 		}
 	}
 }
 
-std::shared_ptr<ThreadPool::taskFunc> ThreadPool::getTask()
+std::shared_ptr<TaskEntry> ThreadPool::getTask()
 {
 	std::unique_lock<std::mutex> lck(mutex);
 
@@ -102,19 +102,18 @@ std::shared_ptr<ThreadPool::taskFunc> ThreadPool::getTask()
 		cvTaskAdd.wait(lck);
 	}
 
-	std::shared_ptr<taskFunc> pFunc;
+	std::shared_ptr<TaskEntry> task;
 
 	if (!taskList.empty())	// 如果线程池已经停止了则任务列表一定是清空的
 	{
-		auto func = taskList.front();
-		pFunc = std::make_shared<taskFunc>(func);
+		task = taskList.front();
 		taskList.pop_front();
 		mxRunningList.lock();
-		taskRunningList.insert(pFunc);
+		taskRunningList.insert(task);
 		mxRunningList.unlock();
 	}
 
-	return pFunc;
+	return task;
 }
 
 void ThreadPool::stop(bool isWait)

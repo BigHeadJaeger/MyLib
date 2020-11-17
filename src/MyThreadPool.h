@@ -9,9 +9,45 @@
 #include<future>
 #include<map>
 #include<set>
+#include<atomic>
+#include<list>
+
+// 开启的线程数
+#define THREAD_NUM 8
 
 namespace threadUtil
 {
+	// 一个任务的实例
+	// 当一个任务需要保存自己的数据，或者有自己的方法的时候继承此类并重写run函数
+	class TaskEntry
+	{
+	public:
+		// 每一个任务都按照下列顺序执行
+		virtual void start(){}
+		virtual bool run() = 0;
+		virtual void end() {
+			//delete this;
+		}
+	};
+
+	// 一个任务只是一个函数的时候
+	//template<typename T> // 支持所有仿函数形式的量
+	class FuncTask : public TaskEntry
+	{
+	public:
+		FuncTask(const std::function<void()>& func) :processFunc(func)
+		{
+		}
+
+		bool run() override
+		{
+			processFunc();
+			return true;
+		}
+
+		std::function<void()> processFunc;
+	};
+
 	enum class POOL_STATE
 	{
 		RUNNING,	// 正在运行
@@ -19,12 +55,11 @@ namespace threadUtil
 		STOP		// 停止状态
 	};
 
-
-	// 不支持在一个任务中 添加一个新任务且等待新任务完成 只添加新任务可以
+	// 不支持在一个任务所在线程执行过程中 添加一个新任务且等待新任务完成 只添加新任务可以
 	class ThreadPool
 	{
 	public:
-		using taskFunc = std::function<void()>;
+		using Func = std::function<void()>;
 
 		static ThreadPool& getInstance()
 		{
@@ -34,6 +69,7 @@ namespace threadUtil
 
 		ThreadPool() :state(POOL_STATE::STOP)
 		{
+			start(THREAD_NUM);
 		}
 
 		~ThreadPool()
@@ -46,11 +82,31 @@ namespace threadUtil
 		}
 		// 开启线程池
 		void start(int num = 4);
-		// 添加任务
-		void addTask(const taskFunc& func);
+		// 添加任务（任务是一个方程）
+		void addTask(const Func& func)
+		{
+			std::unique_lock<std::mutex> lck(mutex);
+			std::unique_lock<std::mutex> lck2(mxWaitTask);
+			if (isRunning())
+			{
+				taskList.push_back(std::make_shared<FuncTask>(func));
+				cvTaskAdd.notify_one();
+			}
+		}
+		// 添加任务（任务是一个派生于TaskEntry的对象）
+		void addTask(std::shared_ptr<TaskEntry> ptrTaskEntry)
+		{
+			std::unique_lock<std::mutex> lck(mutex);
+			std::unique_lock<std::mutex> lck2(mxWaitTask);
+			if (isRunning())
+			{
+				taskList.push_back(ptrTaskEntry);
+				cvTaskAdd.notify_one();
+			}
+		}
+
 		// 等待所有任务完成，调用之后在当前所有任务处理完之前添加新的任务都将阻塞（确保调用的时候已经添加完了所有任务）
 		int waitAllTaskFinish();
-
 		// 立刻停止线程池，抛弃剩余未执行的task
 		void forceStop();
 		// 不再接受任务，等现有任务处理完毕之后停止线程池
@@ -72,24 +128,24 @@ namespace threadUtil
 
 		void threadLoop();
 
-		std::shared_ptr<taskFunc> getTask();
+		std::shared_ptr<TaskEntry> getTask();
 
 		void stop(bool isWait);
 		void reset();
 		void setPoolState(POOL_STATE _state);
 
 		std::mutex mutex;							// 任务列表的操作锁
-		std::mutex mxWaitTask;						// 添加任务时的锁
+		std::mutex mxWaitTask;						// 添加任务时需要看有没有进入等待任务结束的锁
 		std::mutex mxRunningList;					// 列表查询的锁
+
 		std::condition_variable cvTaskAdd;			// 任务添加的条件变量
-		std::condition_variable cvWaitTaskFinish;			// 等待所有任务完成的条件变量
 		int threadNum;								// 管理的线程总数
 		std::vector<std::shared_ptr<std::thread>> threadList;
 
-		std::deque<taskFunc> taskList;
+		//std::deque<Func> taskList;
+		std::list<std::shared_ptr<TaskEntry>> taskList;
 
-		//std::vector<>
-		std::set<std::shared_ptr<taskFunc>> taskRunningList;	// 正在运行的任务列表
+		std::set<std::shared_ptr<TaskEntry>> taskRunningList;	// 正在运行的任务列表
 
 		bool isAcceptTask = true;	// 是否可以接受任务
 

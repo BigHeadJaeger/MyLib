@@ -31,5 +31,11 @@
     <ClInclude Include="Common.h">
       <Filter>common</Filter>
     </ClInclude>
+    <ClInclude Include="MyTimer.h">
+      <Filter>modules</Filter>
+    </ClInclude>
+    <ClInclude Include="MyCondition.hpp">
+      <Filter>modules</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
