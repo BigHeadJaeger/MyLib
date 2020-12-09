@@ -61,7 +61,13 @@ namespace Timer
 			currentTurns = 0;
 			stop();
 		}
+		TimeWheel(const TimeWheel&) = delete;
 
+		static TimeWheel& getInstance()
+		{
+			static TimeWheel instance;
+			return instance;
+		}
 	private:
 		bool isRunning = false;
 
@@ -134,20 +140,11 @@ namespace Timer
 		{
 			taskInfo->interval;
 
-			auto n1 = taskInfo->interval.count() / timeStep;		// 经过此时间间隔指针需要走的次数
+			auto moveStep = taskInfo->interval.count() / timeStep;		// 经过此时间间隔指针需要走的次数
+			auto totalTick = tick + moveStep;
 
-			int resTurns = currentTurns;
-			int resTick = tick;
-			for (size_t i = 0; i < n1; i++)
-			{
-				if ((tick + 1) > (grooveNum - 1))
-				{
-					resTurns++;
-					resTick = 0;
-				}
-				else
-					resTick++;
-			}
+			int resTurns = totalTick / grooveNum + currentTurns;
+			int resTick = totalTick % grooveNum;
 
 			taskInfo->turnIndex = resTurns;
 			taskInfo->grovePos = resTick;
@@ -177,28 +174,17 @@ namespace Timer
 	};
 
 
-	//uint32_t schedule(std::function<void()> func, int seconds, bool loop = true)
-	//{
+	uint32_t schedule(std::function<void()> func, int seconds)
+	{
+		std::chrono::milliseconds t(seconds * 1000);
+		auto id = TimeWheel::getInstance().addNewTask(func, t, true);
+		return id;
+	}
 
-	//}
-
-
-	//class Timer
-	//{
-	//private:
-	//	TimeWheel timeWheel;
-	//private:
-	//	static Timer& getInstance()
-	//	{
-	//		static Timer instance;
-	//		return instance;
-	//	}
-
-	//public:
-	//	uint32_t schedule()
-	//	{
-
-	//	}
-
-	//};
+	uint32_t scheduleOnce(std::function<void()> func, int seconds)
+	{
+		std::chrono::milliseconds t(seconds * 1000);
+		auto id = TimeWheel::getInstance().addNewTask(func, t, false);
+		return id;
+	}
 }

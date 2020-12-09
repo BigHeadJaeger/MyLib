@@ -304,12 +304,27 @@ int main()
 	//	}
 	//}
 
-	chrono::milliseconds t1(100);
+	//chrono::milliseconds t1(100);
 
-	Timer::TimeWheel myWheel;
-	auto n1 = myWheel.addNewTask([]() {
-		cout << "sdsdsd" << endl;
-		}, t1, false);
+	//Timer::TimeWheel myWheel;
+	//auto n1 = myWheel.addNewTask([]() {
+	//	cout << "sdsdsd" << endl;
+	//	}, t1, false);
+
+	auto a = chrono::system_clock::now();
+	auto tt = chrono::system_clock::to_time_t(a);
+	char str[30];
+	ctime_s(str, sizeof(str), &tt);
+	printf_s("%s", str);
+
+	Timer::schedule([]() {
+		auto a = chrono::system_clock::now();
+		auto tt = chrono::system_clock::to_time_t(a);
+		char str[30];
+		ctime_s(str, sizeof(str), &tt);
+		printf_s("%s", str);
+		cout << "xxxx" << endl;
+	}, 2);
 
 
 	getchar();
