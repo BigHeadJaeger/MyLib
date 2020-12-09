@@ -3,7 +3,12 @@
 #include<future>
 #include<tuple>
 #include<queue>
+#include<memory>
+#include<chrono>
+#include<list>
 #include"Common.h"
+
+#include"MyTimer.hpp"
 
 using namespace threadUtil;
 
@@ -29,21 +34,6 @@ void testFunc(int a)
 	//std::cout << "threadid: " << std::this_thread::get_id() << " excuted" << std::endl;
 	std::cout << std::this_thread::get_id() << std::endl;
 }
-
-//template<typename R>
-//typename std::enable_if<!std::is_void<R>::value, std::future<R>>::type newThreadFunc(std::function<R()> processFunc)
-//{
-//	auto ptrPromise = std::make_shared<std::promise<R>>();
-//
-//	auto& myPool = ThreadPool::getInstance();
-//	myPool.addTask([ptrPromise, processFunc]() {
-//		auto value = processFunc();
-//		ptrPromise->set_value(value);
-//		}
-//	);
-//
-//	return ptrPromise->get_future();
-//}
 
 int sum = 0;
 
@@ -104,11 +94,44 @@ void testFun2()
 	cout << "end" << endl;
 }
 
+class Base
+{
+private:
+	int a;
+
+protected:
+	int b;
+};
+
+class IClass : public Base
+{
+public:
+	int c;
+};
+
+class MyTask : public TaskEntry
+{
+private:
+	bool run() override
+	{
+		cout << "sss" << endl;
+		return true;
+	}
+};
+
 
 int main()
 {
 
-	
+	//string* testStr = new string("sss");
+	//{
+	//	auto t2 = make_shared<string>(testStr);
+	//}
+
+	//cout << "Sd" << endl;
+
+
+
 
 	//int a = 1;
 	//int b = 3;
@@ -126,10 +149,41 @@ int main()
 
 	//testFun1(3, 4, 5);
 
-	//tools::processArgs([](auto param) {
-	//	cout << param << endl;
-	//	}, 2, 3, "sd");
+	//string str1 = "asdf";
 
+	//tools::processArgs([](auto&& param) {
+	//	param = "qqq";
+	//	}, str1);
+
+
+
+
+	//auto p1 = make_shared<string>("xxxx");
+
+
+
+	//unique_ptr<string> a = make_unique<string>(str1);
+
+	//*a = "sdds";
+
+
+	//{
+	//	unique_ptr<Base> base1 = make_unique<Base>();
+
+	//	unique_ptr<Base> base2 = make_unique<IClass>();
+
+
+	//	auto test = static_cast<IClass*>(base2.get());
+
+	//	
+	//	//auto test2 = dynamic_cast<IClass*>(base2.get());
+
+	//	cout << "" << endl;
+	//}
+
+
+	//cout << "" << endl;
+	//unique_ptr<string> b = a.get();
 
 
 	//queue<int> testQ;
@@ -142,8 +196,8 @@ int main()
 	//a = testQ.front();
 	//testQ.pop();
 
-	auto& myPool = ThreadPool::getInstance();
-	myPool.start(2);
+	//auto& myPool = ThreadPool::getInstance();
+	//myPool.start(2);
 
 	//auto res = myAsync<int>([]() {
 	//	std::cout << std::this_thread::get_id() << std::endl;
@@ -153,26 +207,27 @@ int main()
 	//	}
 	//).get();
 
+	//for (size_t i = 0; i < 3; i++)
+	//{
+	//	//myPool.addTask([]() {
+	//	//	std::cout << std::this_thread::get_id() << std::endl;
+	//	//	this_thread::sleep_for(chrono::seconds(2));
+	//	//	std::cout << std::this_thread::get_id() << " end" << std::endl;
+	//	//	});
 
-	for (size_t i = 0; i < 3; i++)
-	{
-		//myPool.addTask([]() {
-		//	std::cout << std::this_thread::get_id() << std::endl;
-		//	this_thread::sleep_for(chrono::seconds(2));
-		//	std::cout << std::this_thread::get_id() << " end" << std::endl;
-		//	});
+	//	myAsync<void>([]() {
+	//		std::cout << std::this_thread::get_id() << std::endl;
+	//		this_thread::sleep_for(chrono::seconds(2));
+	//		std::cout << std::this_thread::get_id() << " end" << std::endl;
+	//		}
+	//	);
+	//}
 
-		myAsync<void>([]() {
-			std::cout << std::this_thread::get_id() << std::endl;
-			this_thread::sleep_for(chrono::seconds(2));
-			std::cout << std::this_thread::get_id() << " end" << std::endl;
-			}
-		).get();
-	}
+	//ThreadPool::getInstance().waitAllTaskFinish();
 
-	myPool.waitAllTaskFinish();
+	////myPool.waitAllTaskFinish();
 
-	cout << "task all finish" << endl;
+	//cout << "task all finish" << endl;
 
 
 	//for (int i = 0; i < 4; i++)
@@ -188,70 +243,76 @@ int main()
 	//	}
 	//).get();
 
-	//std::cout << "res = " << res << std::endl;
 
-	//auto res = myAsync<int>([]()
-	//	{
-	//		std::cout << std::this_thread::get_id() << std::endl;
-	//		std::this_thread::sleep_for(std::chrono::seconds(1));
-	//		std::cout << std::this_thread::get_id() << std::endl;
-	//		return 1;
-	//	}
-	//).get();
+	//vector<thread> list;
 
-	//if (res == 1)
+	//for (size_t i = 0; i < 20; i++)
 	//{
-	//	std::cout << "ssss" << std::endl;
+	//	list.push_back(thread([]()
+	//		{
+	//			std::cout << std::this_thread::get_id() << std::endl;
+	//			std::this_thread::sleep_for(std::chrono::seconds(1));
+	//			std::cout << std::this_thread::get_id() << " end" << std::endl;
+	//		}));
+
 	//}
 
-	//myAsync<void>([]()
+	//for (auto& element : list)
+	//{
+	//	element.join();
+	//}
+
+	//auto task = make_shared<MyTask>();
+
+	//ThreadPool::getInstance().addTask(task);
+
+	//getchar();
+
+	//chrono::milliseconds mscond(1000);
+
+	//chrono::time_point<chrono::system_clock> t1 = std::chrono::system_clock::now();
+	//auto s3 = chrono::duration_cast<chrono::milliseconds>(t1.time_since_epoch());
+	//auto s2 = chrono::duration_cast<chrono::seconds>(t1.time_since_epoch());
+	//auto s4 = chrono::duration_cast<chrono::microseconds>(t1.time_since_epoch());
+	//auto s1 = t1.time_since_epoch().count();
+
+	//chrono::milliseconds a(10);
+
+	//chrono::duration<int, milli> test(1000);
+
+	//cout << test.count() << endl;
+
+	//auto p1 = make_unique<string>();
+	//
+	//auto& p2 = p1;
+
+
+
+	//list<string> list1;
+	//list1.push_back("xxx");
+	//list1.push_back("qqq");
+	//list1.push_back("wew");
+	//list1.push_back("eee");
+	//list1.push_back("zzz");
+
+	//auto it = list1.begin();
+	//for (it; it != list1.end(); it++)
+	//{
+	//	if ((*it) == "xxx")
 	//	{
-	//		std::cout << std::this_thread::get_id() << std::endl;
-	//		std::this_thread::sleep_for(std::chrono::seconds(1));
-	//		std::cout << std::this_thread::get_id() << std::endl;
+	//		it = list1.erase(it);
 	//	}
-	//).get();
+	//}
 
-	//auto res = std::async(std::launch::async, []() {
+	chrono::milliseconds t1(100);
 
-	//	return 1;
-	//	}).get();
-
-	for (size_t i = 0; i < 5; i++)
-	{
-		//auto res = myAsync<int>([]() {
-		//	std::cout << std::this_thread::get_id() << std::endl;
-		//	std::this_thread::sleep_for(std::chrono::seconds(1));
-		//	std::cout << std::this_thread::get_id() << std::endl;
-		//	return 1;
-		//	}).get();
-		//myAsync<int>([]() {
-		//	std::cout << std::this_thread::get_id() << std::endl;
-		//	std::this_thread::sleep_for(std::chrono::seconds(2));
-		//	std::cout << std::this_thread::get_id() << std::endl;
-		//	return 1;
-		//	});
-
-		//myPool.addTask(std::bind(testFunc, 2));
-	}
-
-	//std::this_thread::sleep_for(std::chrono::seconds(1));
-	//myPool.forceStop();
-
-
-	//myPool.
-	//myPool.waitStop();
-
-
-	//auto res = myAsync<std::tuple<int, std::string, int>>([]() 
-	//	{
-	//		auto test = std::make_tuple(2, "ere", 4);
-	//		return test;
-	//	}
-	//).get();
+	Timer::TimeWheel myWheel;
+	auto n1 = myWheel.addNewTask([]() {
+		cout << "sdsdsd" << endl;
+		}, t1, false);
 
 
 	getchar();
-
+	
 	return 0;
 }
