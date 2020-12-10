@@ -121,6 +121,7 @@ namespace Timer
 					auto pTask = (*it);
 					// 将任务从list中移除
 					it = taskList.erase(it);
+					// 从id记录map中移除
 
 					// 执行定时方法
 					pTask->func();
@@ -154,15 +155,6 @@ namespace Timer
 			taskWheel[resTick].push_back(taskInfo);
 		}
 
-		//// 添加任务接口
-		//void insertTask(std::function<void>& func, std::chrono::milliseconds interval, bool isLoop = true)
-		//{
-		//	auto taskInfo = std::make_shared<TaskInfo>(func, interval, isLoop);
-		//	// 根据间隔计算需要放在哪一层的哪一个槽 	
-
-
-		//}
-
 	public:
 		uint32_t addNewTask(std::function<void()> func, std::chrono::milliseconds interval, bool isLoop = true)
 		{
@@ -170,6 +162,12 @@ namespace Timer
 			task->id = ids++;
 			insertTask(task);
 			return task->id;
+		}
+
+		// 根据id删除某个任务
+		void removeTaskById(uint32_t id)
+		{
+
 		}
 	};
 

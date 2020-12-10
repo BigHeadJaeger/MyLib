@@ -6,9 +6,11 @@
 #include<memory>
 #include<chrono>
 #include<list>
+#include<map>
 #include"Common.h"
 
 #include"MyTimer.hpp"
+#include"ThreadTimer.hpp"
 
 using namespace threadUtil;
 
@@ -326,6 +328,13 @@ int main()
 		cout << "xxxx" << endl;
 	}, 2);
 
+
+	map<int, int> map1;
+	map1.insert({ 3,1 });
+	map1.insert({ 4,2 });
+
+	auto it = map1.find(3);
+	map1.erase(it);
 
 	getchar();
 	

@@ -15,19 +15,22 @@
     <Filter Include="modules">
       <UniqueIdentifier>{ee5d97a0-8b1d-493a-b594-d8e7eb157d7b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="modules\Timer">
+      <UniqueIdentifier>{485bd514-fbbd-47ed-a6f2-c918126db463}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="modules\ThreadPool">
+      <UniqueIdentifier>{c06ee1dc-e3db-45ce-8461-de1895aea316}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="MyThreadPool.cpp">
-      <Filter>modules</Filter>
-    </ClCompile>
     <ClCompile Include="TestMain.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="MyThreadPool.cpp">
+      <Filter>modules\ThreadPool</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="MyThreadPool.h">
-      <Filter>modules</Filter>
-    </ClInclude>
     <ClInclude Include="Common.h">
       <Filter>common</Filter>
     </ClInclude>
@@ -35,7 +38,13 @@
       <Filter>modules</Filter>
     </ClInclude>
     <ClInclude Include="MyTimer.hpp">
-      <Filter>modules</Filter>
+      <Filter>modules\Timer</Filter>
+    </ClInclude>
+    <ClInclude Include="MyThreadPool.h">
+      <Filter>modules\ThreadPool</Filter>
+    </ClInclude>
+    <ClInclude Include="ThreadTimer.hpp">
+      <Filter>modules\Timer</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

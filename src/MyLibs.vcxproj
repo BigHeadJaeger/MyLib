@@ -147,6 +147,7 @@
     <ClInclude Include="MyCondition.hpp" />
     <ClInclude Include="MyThreadPool.h" />
     <ClInclude Include="MyTimer.hpp" />
+    <ClInclude Include="ThreadTimer.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
