@@ -121,54 +121,37 @@ private:
 	}
 };
 
+void fun6(int a, int b, int c)
+{
+	cout << a << endl;
+	cout << b << endl;
+	cout << c << endl;
+}
+
+int fun7(int a)
+{
+
+	return a + 1;
+}
+
+
+void printTime(int id)
+{
+	auto a = chrono::system_clock::now();
+	auto tt = chrono::system_clock::to_time_t(a);
+	char str[30];
+	ctime_s(str, sizeof(str), &tt);
+	printf_s("%d   %s", id, str);
+}
 
 int main()
 {
+	//auto f1 = bind(fun6, 3, 5, placeholders::_1);
 
-	//string* testStr = new string("sss");
-	//{
-	//	auto t2 = make_shared<string>(testStr);
-	//}
-
-	//cout << "Sd" << endl;
+	//f1(3);
 
 
-
-
-	//int a = 1;
-	//int b = 3;
-
-	//auto test = (a += b, a);
-
-	//int total = fun2(3, 4, 5);
-	//expand(4, 23, 2, "sd");
-
-	//expand2([](auto a) {
-	//	cout << a << endl;
-	//	}, 1, 3, "Sds");
-
-	//expand2(excuteFun<int>, 1, 3);
-
-	//testFun1(3, 4, 5);
-
-	//string str1 = "asdf";
-
-	//tools::processArgs([](auto&& param) {
-	//	param = "qqq";
-	//	}, str1);
-
-
-
-
-	//auto p1 = make_shared<string>("xxxx");
-
-
-
-	//unique_ptr<string> a = make_unique<string>(str1);
-
-	//*a = "sdds";
-
-
+	//cout << "sss" << endl;
 	//{
 	//	unique_ptr<Base> base1 = make_unique<Base>();
 
@@ -341,18 +324,18 @@ int main()
 	char str[30];
 	ctime_s(str, sizeof(str), &tt);
 	printf_s("%s", str);
+	//uint32_t scheID = 0;
+	//scheID = Timer::schedule([&]() {
+	//	printTime(scheID);
+	//}, 2);
 
-	auto scheID = Timer::schedule([]() {
-		auto a = chrono::system_clock::now();
-		auto tt = chrono::system_clock::to_time_t(a);
-		char str[30];
-		ctime_s(str, sizeof(str), &tt);
-		printf_s("2s**** %s", str);
-	}, 2);
+	//Timer::scheduleOnce([&]() {
+	//	Timer::unSchedule(scheID);
+	//}, 5);
 
-	Timer::scheduleOnce([&]() {
-		Timer::unSchedule(scheID);
-	}, 5);
+	Timer::schedule([]() {
+		printTime(1);
+	}, 0.01);
 
 	getchar();
 	
