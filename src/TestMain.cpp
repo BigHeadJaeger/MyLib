@@ -313,6 +313,29 @@ int main()
 	//	cout << "sdsdsd" << endl;
 	//	}, t1, false);
 
+	//auto a = chrono::system_clock::now();
+	//auto tt = chrono::system_clock::to_time_t(a);
+	//char str[30];
+	//ctime_s(str, sizeof(str), &tt);
+	//printf_s("%s", str);
+
+	//Timer::schedule([]() {
+	//	auto a = chrono::system_clock::now();
+	//	auto tt = chrono::system_clock::to_time_t(a);
+	//	char str[30];
+	//	ctime_s(str, sizeof(str), &tt);
+	//	printf_s("%s", str);
+	//	cout << "xxxx" << endl;
+	//}, 2);
+
+
+	//map<int, int> map1;
+	//map1.insert({ 3,1 });
+	//map1.insert({ 4,2 });
+
+	//auto it = map1.find(3);
+	//map1.erase(it);
+
 	auto a = chrono::system_clock::now();
 	auto tt = chrono::system_clock::to_time_t(a);
 	char str[30];
@@ -324,17 +347,16 @@ int main()
 		auto tt = chrono::system_clock::to_time_t(a);
 		char str[30];
 		ctime_s(str, sizeof(str), &tt);
-		printf_s("%s", str);
-		cout << "xxxx" << endl;
+		printf_s("2s**** %s", str);
 	}, 2);
 
-
-	map<int, int> map1;
-	map1.insert({ 3,1 });
-	map1.insert({ 4,2 });
-
-	auto it = map1.find(3);
-	map1.erase(it);
+	Timer::schedule([]() {
+		auto a = chrono::system_clock::now();
+		auto tt = chrono::system_clock::to_time_t(a);
+		char str[30];
+		ctime_s(str, sizeof(str), &tt);
+		printf_s("3s**** %s", str);
+		}, 3);
 
 	getchar();
 	
