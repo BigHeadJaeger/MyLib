@@ -342,7 +342,7 @@ int main()
 	ctime_s(str, sizeof(str), &tt);
 	printf_s("%s", str);
 
-	Timer::schedule([]() {
+	auto scheID = Timer::schedule([]() {
 		auto a = chrono::system_clock::now();
 		auto tt = chrono::system_clock::to_time_t(a);
 		char str[30];
@@ -350,13 +350,9 @@ int main()
 		printf_s("2s**** %s", str);
 	}, 2);
 
-	Timer::schedule([]() {
-		auto a = chrono::system_clock::now();
-		auto tt = chrono::system_clock::to_time_t(a);
-		char str[30];
-		ctime_s(str, sizeof(str), &tt);
-		printf_s("3s**** %s", str);
-		}, 3);
+	Timer::scheduleOnce([&]() {
+		Timer::unSchedule(scheID);
+	}, 5);
 
 	getchar();
 	

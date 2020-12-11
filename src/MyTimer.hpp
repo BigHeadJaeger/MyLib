@@ -17,180 +17,6 @@
 
 namespace Timer
 {
-	//struct TaskInfo
-	//{
-	//	uint32_t id;
-	//	bool isLoop;
-	//	std::chrono::milliseconds interval;
-	//	int turnIndex;						// 任务所在的轮数（处理每一个槽的时候只处理turnIndex和currentTurns相等的任务）
-	//	int grovePos;						// 所在槽的位置
-	//	std::function<void()> func;			// 任务执行函数
-
-	//	TaskInfo(std::function<void()> _func, std::chrono::milliseconds _interval, bool _isLoop)
-	//	{
-	//		func = _func;
-	//		interval = _interval;
-	//		isLoop = _isLoop;
-	//	}
-	//};
-
-	//// 时间轮
-	//using TaskList = std::list<std::shared_ptr<TaskInfo>>;
-	//class TimeWheel
-	//{
-	//private:
-	//	uint32_t grooveNum;					// 每一轮的槽数
-	//	uint32_t currentTurns;				// 当前的轮数
-	//	int timeStep;						// 轮循的时间步长，单位毫秒ms
-
-	//	int tick;							// 时间轮的指针（每次移动一个槽位）
-
-	//	std::atomic_uint ids = 1;				// 每开启一个计时器分配一个id
-
-	//	std::vector<TaskList> taskWheel;
-
-	//	std::shared_ptr<std::thread> loopThread;		// 时间轮循线程
-
-	//	std::map<uint32_t, int> taskManager;		// 通过id找到某个任务（用于查找<id, grovePos>）
-
-	//public:
-	//	TimeWheel() :grooveNum(GROOVE_NUM), timeStep(TIME_STEP), currentTurns(0), tick(0)
-	//	{
-	//		taskWheel.resize(grooveNum, TaskList());
-	//		start();
-	//	}
-
-	//	~TimeWheel()
-	//	{
-	//		taskWheel.clear();
-	//		currentTurns = 0;
-	//		stop();
-	//	}
-	//	TimeWheel(const TimeWheel&) = delete;
-
-	//	static TimeWheel& getInstance()
-	//	{
-	//		static TimeWheel instance;
-	//		return instance;
-	//	}
-	//private:
-	//	bool isRunning = false;
-
-	//	void start()
-	//	{
-	//		isRunning = true;
-	//		// 开启线程的主循环
-	//		loopThread = std::make_unique<std::thread>(std::bind(&TimeWheel::mainLoop, this));
-	//	}
-
-	//	void stop()
-	//	{
-	//		isRunning = false;
-	//		loopThread->join();
-	//	}
-
-	//	void mainLoop()
-	//	{
-	//		while (isRunning)
-	//		{
-	//			std::this_thread::sleep_for(std::chrono::milliseconds(timeStep));	// 每次循环睡眠指针移动一格的时间
-	//			tickForward();
-	//			processTaskList();
-	//		}
-	//	}
-
-	//	// 时针向前走
-	//	void tickForward()
-	//	{
-	//		tick++;
-	//		auto n1 = tick / grooveNum;
-	//		if (n1 >= 1)
-	//		{// 进入下一轮
-	//			auto remainder = tick % grooveNum;
-	//			tick = remainder;
-	//			currentTurns++;
-	//		}
-	//	}
-
-	//	// 处理当前时针下的任务列表
-	//	void processTaskList()
-	//	{
-	//		TaskList test;
-	//		auto& taskList = taskWheel[tick];
-
-	//		auto it = taskList.begin();
-	//		for (it; it != taskList.end();)
-	//		{
-	//			if ((*it)->turnIndex == currentTurns)
-	//			{
-	//				auto pTask = (*it);
-	//				// 将任务从list中移除
-	//				it = taskList.erase(it);
-	//				// 从id记录map中移除
-
-	//				// 执行定时方法
-	//				pTask->func();
-	//				// 根据是否循环重新放置任务位置
-	//				if (pTask->isLoop)
-	//				{
-	//					insertTask(pTask);
-	//				}
-	//			}
-	//			else
-	//				it++;
-	//		}
-	//	}
-
-	//	// 添加任务
-	//	void insertTask(std::shared_ptr<TaskInfo>& taskInfo)
-	//	{
-	//		taskInfo->interval;
-
-	//		auto moveStep = taskInfo->interval.count() / timeStep;		// 经过此时间间隔指针需要走的次数
-	//		auto totalTick = tick + moveStep;
-
-	//		int resTurns = totalTick / grooveNum + currentTurns;
-	//		int resTick = totalTick % grooveNum;
-
-	//		taskInfo->turnIndex = resTurns;
-	//		taskInfo->grovePos = resTick;
-
-	//		taskManager[taskInfo->id] = resTick;	// 记录任务在第几个槽
-
-	//		taskWheel[resTick].push_back(taskInfo);
-	//	}
-
-	//public:
-	//	uint32_t addNewTask(std::function<void()> func, std::chrono::milliseconds interval, bool isLoop = true)
-	//	{
-	//		auto task = std::make_shared<TaskInfo>(func, interval, isLoop);
-	//		task->id = ids++;
-	//		insertTask(task);
-	//		return task->id;
-	//	}
-
-	//	// 根据id删除某个任务
-	//	void removeTaskById(uint32_t id)
-	//	{
-
-	//	}
-	//};
-
-
-	//uint32_t schedule(std::function<void()> func, int seconds)
-	//{
-	//	std::chrono::milliseconds t(seconds * 1000);
-	//	auto id = TimeWheel::getInstance().addNewTask(func, t, true);
-	//	return id;
-	//}
-
-	//uint32_t scheduleOnce(std::function<void()> func, int seconds)
-	//{
-	//	std::chrono::milliseconds t(seconds * 1000);
-	//	auto id = TimeWheel::getInstance().addNewTask(func, t, false);
-	//	return id;
-	//}
-
 	// 任务间隔需要转换成每层对应的指针走动数
 	// <0, 3> 第一层走3格
 	// <1, 1> 第二层走1格
@@ -201,15 +27,15 @@ namespace Timer
 	struct TaskInfo
 	{
 		uint32_t id;
-		uint32_t startTime;					// 任务加入时的时间
 
 		bool isLoop;
 		std::chrono::milliseconds interval;
 		int layerIndex;						// 任务所在的层数
-		int groovePos;						// 所在槽的位置
 		std::function<void()> func;			// 任务执行函数
 
 		std::map<short, int> posInfo;		// 任务插入的时候每一层走过的格数
+
+		bool isActive = true;
 
 		TaskInfo(std::function<void()> _func, std::chrono::milliseconds _interval, bool _isLoop)
 		{
@@ -272,6 +98,10 @@ namespace Timer
 		std::vector<Wheel> wheels;		// 每一层的时间轮集合
 		bool isRunning = false;
 		std::shared_ptr<std::thread> loopThread;		// 时间轮循线程
+
+		std::atomic_uint ids = 1;
+
+		std::map<uint32_t, std::weak_ptr<TaskInfo>> taskMap;	// 通过id查询到任务
 	public:
 		LayerTimeWheel()
 		{
@@ -290,6 +120,48 @@ namespace Timer
 			start();
 		}
 
+		static LayerTimeWheel& getInstance()
+		{
+			static LayerTimeWheel instance;
+			return instance;
+		}
+
+		uint32_t addNewTask(std::function<void()> func, std::chrono::milliseconds interval, bool isLoop = true)
+		{
+			auto task = std::make_shared<TaskInfo>(func, interval, isLoop);
+			task->id = ids++;
+			taskMap[task->id] = task;
+			insertTask(task);
+			return task->id;
+		}
+
+		void removeTaskByID(uint32_t id)
+		{
+			auto mapIt = taskMap.find(id);
+			if (mapIt != taskMap.end())
+			{
+				if (!mapIt->second.expired())
+				{
+					int layerIndex = mapIt->second.lock()->layerIndex;
+					int pos = mapIt->second.lock()->posInfo[layerIndex];
+					auto& targetList = wheels[layerIndex].taskWheel[pos];
+					for (auto it = targetList.begin(); it != targetList.end(); it++)
+					{
+						if ((*it)->id == id)
+						{// 此处不删除任务，删除统一在循环中进行，否则会导致主循环的迭代器失效
+							// 关闭任务
+							(*it)->isActive = false;
+							break;
+						}
+					}
+					// 删除map中的记录
+					taskMap.erase(mapIt);
+				}
+				else
+					std::cout << "error task expired" << std::endl;
+			}
+		}
+	private:
 		void start()
 		{
 			isRunning = true;
@@ -311,12 +183,6 @@ namespace Timer
 				timeForward();
 				//processTaskList();
 			}
-		}
-
-		static LayerTimeWheel& getInstance()
-		{
-			static LayerTimeWheel instance;
-			return instance;
 		}
 
 		// 时间向前走一个单位，从底到高层顺序遍历每一层的时间轮，前一层发生进位下一层指针移动一次
@@ -351,12 +217,19 @@ namespace Timer
 				// 从当前列表删除任务
 				it = list.erase(it);
 
+				if (!taskInfo->isActive)
+				{
+					continue;
+				}
+
 				if (index == 0)
 				{// 底层时间轮直接执行
 					taskInfo->func();
 					// 根据是否循环重新插入任务
 					if (taskInfo->isLoop)
 						insertTask(std::move(taskInfo));
+					else
+						removeTaskFromMap(taskInfo->id);
 				}
 				else
 				{
@@ -375,6 +248,8 @@ namespace Timer
 						taskInfo->func();
 						if (taskInfo->isLoop)
 							insertTask(std::move(taskInfo));
+						else
+							removeTaskFromMap(taskInfo->id);
 					}
 					else
 					{
@@ -383,10 +258,15 @@ namespace Timer
 						insertToTargetPos(taskInfo, index - 1, taskInfo->posInfo[index - 1]);
 					}
 				}
-
 			}
-
 			//wheel.taskWheel[tick]
+		}
+
+		void removeTaskFromMap(uint32_t id)
+		{
+			auto it = taskMap.find(id);
+			if (it != taskMap.end())
+				taskMap.erase(it);
 		}
 
 		// 获取当前轮的下一层
@@ -427,6 +307,7 @@ namespace Timer
 					break;
 				}
 			}
+			taskInfo->layerIndex = resLayer;
 			wheels[resLayer].taskWheel[remain].push_back(taskInfo);
 		}
 
@@ -435,25 +316,24 @@ namespace Timer
 			wheels[wheelIndex].taskWheel[groovePos].push_back(taskInfo);
 		}
 
-		void addNewTask(std::function<void()> func, std::chrono::milliseconds interval, bool isLoop = true)
-		{
-			auto task = std::make_shared<TaskInfo>(func, interval, isLoop);
-			insertTask(task);
-		}
 	};
-
 
 	uint32_t schedule(std::function<void()> func, int seconds)
 	{
 		std::chrono::milliseconds t(seconds * 1000);
-		LayerTimeWheel::getInstance().addNewTask(func, t, true);
-		return 1;
+		auto id = LayerTimeWheel::getInstance().addNewTask(func, t, true);
+		return id;
 	}
 
 	uint32_t scheduleOnce(std::function<void()> func, int seconds)
 	{
 		std::chrono::milliseconds t(seconds * 1000);
-		LayerTimeWheel::getInstance().addNewTask(func, t, false);
-		return 1;
+		auto id = LayerTimeWheel::getInstance().addNewTask(func, t, false);
+		return id;
+	}
+
+	void unSchedule(uint32_t id)
+	{
+		LayerTimeWheel::getInstance().removeTaskByID(id);
 	}
 }
