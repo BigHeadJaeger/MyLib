@@ -140,6 +140,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="MyThreadPool.cpp" />
+    <ClCompile Include="MyTimer.cpp" />
     <ClCompile Include="TestMain.cpp" />
   </ItemGroup>
   <ItemGroup>

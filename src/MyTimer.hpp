@@ -132,22 +132,7 @@ namespace Timer
 
 
 	// 对外接口
-	uint32_t schedule(std::function<void()> func, int seconds)
-	{
-		std::chrono::milliseconds t(seconds * 1000);
-		auto id = LayerTimeWheel::getInstance().addNewTask(func, t, true);
-		return id;
-	}
-
-	uint32_t scheduleOnce(std::function<void()> func, int seconds)
-	{
-		std::chrono::milliseconds t(seconds * 1000);
-		auto id = LayerTimeWheel::getInstance().addNewTask(func, t, false);
-		return id;
-	}
-
-	void unSchedule(uint32_t id)
-	{
-		LayerTimeWheel::getInstance().removeTaskByID(id);
-	}
+	uint32_t schedule(std::function<void()> func, float seconds);
+	uint32_t scheduleOnce(std::function<void()> func, float seconds);
+	void unSchedule(uint32_t id);
 }

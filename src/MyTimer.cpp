@@ -1,4 +1,5 @@
 #include "MyTimer.hpp"
+#include<math.h>
 
 using namespace Timer;
 
@@ -201,4 +202,25 @@ void Timer::LayerTimeWheel::insertTask(std::shared_ptr<TaskInfo> taskInfo)
 void Timer::LayerTimeWheel::insertToTargetPos(std::shared_ptr<TaskInfo> taskInfo, int wheelIndex, int groovePos)
 {
 	wheels[wheelIndex].taskWheel[groovePos].push_back(taskInfo);
+}
+
+uint32_t Timer::schedule(std::function<void()> func, float seconds)
+{
+	int num = std::floor(seconds * 1000);
+	std::chrono::milliseconds t(num);
+	auto id = LayerTimeWheel::getInstance().addNewTask(func, t, true);
+	return id;
+}
+
+uint32_t Timer::scheduleOnce(std::function<void()> func, float seconds)
+{
+	int num = std::floor(seconds * 1000);
+	std::chrono::milliseconds t(num);
+	auto id = LayerTimeWheel::getInstance().addNewTask(func, t, false);
+	return id;
+}
+
+void Timer::unSchedule(uint32_t id)
+{
+	LayerTimeWheel::getInstance().removeTaskByID(id);
 }

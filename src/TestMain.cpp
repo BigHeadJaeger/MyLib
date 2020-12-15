@@ -319,19 +319,31 @@ int main()
 	//auto it = map1.find(3);
 	//map1.erase(it);
 
-	auto a = chrono::system_clock::now();
-	auto tt = chrono::system_clock::to_time_t(a);
-	char str[30];
-	ctime_s(str, sizeof(str), &tt);
-	printf_s("%s", str);
-	//uint32_t scheID = 0;
-	//scheID = Timer::schedule([&]() {
-	//	printTime(scheID);
-	//}, 2);
+	//int a = -1;
+	//if (a)
+	//{
+	//	cout << "ss";
+	//}
+	//else
+	//{
+	//	cout << "xx";
+	//}
 
-	//Timer::scheduleOnce([&]() {
-	//	Timer::unSchedule(scheID);
-	//}, 5);
+
+
+	//auto a = chrono::system_clock::now();
+	//auto tt = chrono::system_clock::to_time_t(a);
+	//char str[30];
+	//ctime_s(str, sizeof(str), &tt);
+	//printf_s("%s", str);
+	////uint32_t scheID = 0;
+	////scheID = Timer::schedule([&]() {
+	////	printTime(scheID);
+	////}, 2);
+
+	////Timer::scheduleOnce([&]() {
+	////	Timer::unSchedule(scheID);
+	////}, 5);
 
 	Timer::schedule([]() {
 		printTime(1);
