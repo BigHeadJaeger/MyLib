@@ -49,5 +49,8 @@
     <ClInclude Include="ThreadTimer.hpp">
       <Filter>modules\Timer</Filter>
     </ClInclude>
+    <ClInclude Include="Algorithm.hpp">
+      <Filter>common</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
