@@ -146,7 +146,7 @@ namespace Algorithm
 			int min = target[i];
 			int minIndex = i;
 
-			for (int j = i+ 1; j < target.size(); j++)
+			for (int j = i + 1; j < target.size(); j++)
 			{
 				if (target[j] < min)
 				{
@@ -158,6 +158,50 @@ namespace Algorithm
 			target[minIndex] = target[i];
 			target[i] = min;
 		}
+	}
+
+	int getStandard(std::vector<int>& target, int low, int high)
+	{
+		int i = low;
+		int j = high;
+		int key = target[low];
+
+		while (i < j)
+		{
+			while (i < j && target[j] > key)
+			{
+				j--;
+			}
+			if (i < j)
+			{
+				target[i] = target[j];
+			}
+
+			while (i < j && target[i] < key)
+			{
+				i++;
+			}
+			if (i < j)
+			{
+				target[j] = target[i];
+			}
+		}
+
+		target[i] = key;
+		return i;
+	}
+	void quickSortT1(std::vector<int>& target, int low, int high)
+	{
+		if (low < high)
+		{
+			int pos = getStandard(target, low, high);
+			quickSortT1(target, low, pos);
+			quickSortT1(target, pos + 1, high);
+		}
+	}
+	void sortT1(std::vector<int>& target)
+	{
+		quickSortT1(target, 0, target.size() - 1);
 	}
 }
 
