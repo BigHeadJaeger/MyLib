@@ -21,6 +21,9 @@
     <Filter Include="modules\ThreadPool">
       <UniqueIdentifier>{c06ee1dc-e3db-45ce-8461-de1895aea316}</UniqueIdentifier>
     </Filter>
+    <Filter Include="modules\RWLock">
+      <UniqueIdentifier>{fd9593c1-b9c3-4220-9c74-33e47369f320}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="TestMain.cpp">
@@ -51,6 +54,9 @@
     </ClInclude>
     <ClInclude Include="Algorithm.hpp">
       <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="MyRwLock.h">
+      <Filter>modules\RWLock</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
