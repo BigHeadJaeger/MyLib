@@ -80,9 +80,10 @@ void Timer::LayerTimeWheel::mainLoop()
 
 void Timer::LayerTimeWheel::timeForward()
 {
-	bool isAdd = true;
+	bool isAdd = true;		// 最底层一定要走，所以默认为true
 	for (size_t i = 0; i < wheels.size(); i++)
 	{
+		// 如果当前层的指针发生了进位，则下一层的指针也要向前走
 		if (isAdd)
 		{
 			isAdd = wheels[i].tickForward();
@@ -92,6 +93,10 @@ void Timer::LayerTimeWheel::timeForward()
 				return;
 			}
 			processOneWheelTask(wheels[i], i);
+		}
+		else
+		{
+			break;
 		}
 	}
 }

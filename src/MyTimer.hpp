@@ -42,7 +42,7 @@ namespace Timer
 		}
 	};
 
-	// 时间轮
+	// 任务集合
 	using TaskList = std::list<std::shared_ptr<TaskInfo>>;
 
 	// 一层时间轮的信息
@@ -99,6 +99,10 @@ namespace Timer
 		std::map<uint32_t, std::weak_ptr<TaskInfo>> taskMap;	// 通过id查询到任务
 	public:
 		LayerTimeWheel();
+		~LayerTimeWheel()
+		{
+			stop();
+		}
 		static LayerTimeWheel& getInstance()
 		{
 			static LayerTimeWheel instance;
@@ -127,6 +131,7 @@ namespace Timer
 		// 添加任务，根据interval计算出
 		void insertTask(std::shared_ptr<TaskInfo> taskInfo);
 		void insertToTargetPos(std::shared_ptr<TaskInfo> taskInfo, int wheelIndex, int groovePos);
+
 	};
 
 
